@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>成績輸入系統</title>
+  <!-- 引入 Firebase SDK 模組 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+
+    // Firebase 配置
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfdX5eUpY33Dh_nvgFuk6cQrxqRRjDM7w",
+      authDomain: "fir-01-25708.firebaseapp.com",
+      databaseURL: "https://fir-01-25708-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "fir-01-25708",
+      storageBucket: "fir-01-25708.firebasestorage.app",
+      messagingSenderId: "1038722408585",
+      appId: "1:1038722408585:web:27d27a5e48292f3af62658",
+      measurementId: "G-FS3878JT8V"
+    };
+
+    // 初始化 Firebase 應用
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    // 初始化 Firebase Realtime Database
+    const database = getDatabase(app);
+
+    // 取得表單元素
+    const gradeForm = document.getElementById('gradeForm');
+    const nameInput = document.getElementById('name');
+    const gradeInput = document.getElementById('grade');
+
+    // 表單提交事件
+    gradeForm.addEventListener('submit', function(event) {
+      event.preventDefault(); // 防止頁面重新加載
+
+      const studentName = nameInput.value;
+      const studentGrade = gradeInput.value;
+
+      // 生成新資料，並將資料存入 Firebase Realtime Database
+      const gradesRef = ref(database, 'grades'); // 指定 grades 節點
+      const newGradeRef = push(gradesRef); // 使用 push() 創建新的資料項目
+      set(newGradeRef, {
+        name: studentName,
+        grade: studentGrade
+      })
+      .then(() => {
+        alert('成績已儲存!');
+        nameInput.value = ''; // 清空表單
+        gradeInput.value = '';
+      })
+      .catch((error) => {
+        console.error('錯誤:', error);
+        alert('儲存成績失敗!');
+      });
+    });
+  </script>
+</head>
+<body>
+  <h1>成績輸入</h1>
+  <form id="gradeForm">
+    <label for="name">學生名稱：</label>
+    <input type="text" id="name" required><br><br>
+    
+    <label for="grade">成績：</label>
+    <input type="number" id="grade" required><br><br>
+    
+    <button type="submit">送出</button>
+  </form>
+</body>
+</html>
